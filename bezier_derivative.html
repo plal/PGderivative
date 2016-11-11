@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/bonsai/0.4/bonsai.min.js"></script>
+<div id="movie"></div>
+<script>
+  bonsai.run(document.getElementById('movie'), {
+    code: function() {
+	var points = [];
+	var circles = [];
+	var canvas1 = {};
+	var canvas2 = {};
+      
+	canvas2 = new Rect(750,0,stage.options.width,stage.options.height);
+	canvas2.attr('fillColor', 'black');
+	canvas2.addTo(stage);
+      
+	canvas1 = new Rect(0,0,(stage.options.width/2), stage.options.height);
+	canvas1.attr('fillColor', 'white');
+	canvas1.addTo(stage);
+
+	function interp(r,i,t) {
+		if(r==0) return points[i]
+
+		var p1 = interp(r-1,i,t)
+		var p2 = interp(r-1,i+1,t)
+
+		return new Point((1-t)*p1.x + t*p2.x, (1-t)*p1.y + t*p2.y)
+	}
+
+	function deCasteljau() {
+		var newPoints = []
+		for(var t=0; t<=1; t+=0.0007) {
+			var castPoint = interp(points.length-1,0,t)
+			newPoints.push(castPoint.x)
+			newPoints.push(castPoint.y)
+		}
+		return new Path(newPoints).stroke('navy', 1)
+	}
+
+	canvas1.on('click', function(e) {
+        	points.push(new Point(e.x, e.y))
+        	var circ = new Circle(e.x, e.y, 3).fill('navy');
+		circles.push(circ);
+        	circ.addTo(stage);
+		if(circles.length > 1){
+			var paths = []
+			for(var i=0;i<circles.length-1;i++){
+				paths.push(new Path([
+					['moveTo', circles[i].attr('x'), circles[i].attr('y')],
+					['lineTo', circles[i+1].attr('x'), circles[i+1].attr('y')]				
+				]).stroke('black',0.9));			
+			}
+			if(points.length >= 3){
+				var curve = deCasteljau()
+				paths.push(curve)
+			}
+			var stageObjects = [];
+			stageObjects.push(canvas1)
+			stageObjects.push(canvas2)
+			paths.forEach(function(p){
+				stageObjects.push(p);
+			});
+			circles.forEach(function(c) {
+				stageObjects.push(c);
+			});
+			stage.children(stageObjects);
+		}
+      	});
+
+	
+
+    },
+    width: 1500,
+    height: 750
+});
+</script>
+</head>
+</html>
