@@ -7,7 +7,10 @@
   bonsai.run(document.getElementById('movie'), {
     code: function() {
 	var points = [];
+	var points2 = [];
 	var circles = [];
+	var circles2 = [];
+	var curve = [];
 	var canvas1 = {};
 	var canvas2 = {};
       
@@ -19,29 +22,35 @@
 	canvas1.attr('fillColor', 'white');
 	canvas1.addTo(stage);
 
-	function interp(r,i,t) {
-		if(r==0) return points[i]
-
-		var p1 = interp(r-1,i,t)
-		var p2 = interp(r-1,i+1,t)
-
-		return new Point((1-t)*p1.x + t*p2.x, (1-t)*p1.y + t*p2.y)
+	function interp(ponto1, ponto2, t){
+	  var coord1 = (1-t)*ponto1.x + t*ponto2.x
+	  var coord2 = (1-t)*ponto1.y + t*ponto2.y
+	  return new Point(coord1,coord2)
 	}
-
-	function deCasteljau() {
-		var newPoints = []
-		for(var t=0; t<=1; t+=0.0007) {
-			var castPoint = interp(points.length-1,0,t)
-			newPoints.push(castPoint.x)
-			newPoints.push(castPoint.y)
+	
+	function deCasteljau(){
+	  curve = []
+	  for (var t = 0; t <= 1; t+=0.001) {
+		var auxPoints = []
+		auxPoints = points
+		while (auxPoints.length>1) {
+		  var tamanho = auxPoints.length
+		  var temp2 = []
+		  for (var i = 0; i < tamanho-1; i++) {
+			var newPoint = interp(auxPoints[i], auxPoints[i+1], t)
+			temp2.push(newPoint)
+		  }
+		  auxPoints = temp2;
 		}
-		return new Path(newPoints).stroke('navy', 1)
+		curve.push(auxPoints[0].x)
+		curve.push(auxPoints[0].y)
+	  }
 	}
-
 	canvas1.on('click', function(e) {
+			curve = []
         	points.push(new Point(e.x, e.y))
         	var circ = new Circle(e.x, e.y, 3).fill('navy');
-		circles.push(circ);
+			circles.push(circ);
         	circ.addTo(stage);
 		if(circles.length > 1){
 			var paths = []
@@ -49,11 +58,11 @@
 				paths.push(new Path([
 					['moveTo', circles[i].attr('x'), circles[i].attr('y')],
 					['lineTo', circles[i+1].attr('x'), circles[i+1].attr('y')]				
-				]).stroke('black',0.9));			
+				]).stroke('green',0.9));			
 			}
 			if(points.length >= 3){
-				var curve = deCasteljau()
-				paths.push(curve)
+				deCasteljau()
+				paths.push(new Path(curve).stroke('blue', 1))
 			}
 			var stageObjects = [];
 			stageObjects.push(canvas1)
