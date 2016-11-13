@@ -7,10 +7,11 @@
   bonsai.run(document.getElementById('movie'), {
     code: function() {
 	var points = [];
-	var points2 = [];
+	var intPoints = [];
 	var circles = [];
-	var circles2 = [];
+	var intCircles = [];
 	var curve = [];
+	var intCurve = [];
 	var canvas1 = {};
 	var canvas2 = {};
       
@@ -46,6 +47,26 @@
 		curve.push(auxPoints[0].y)
 	  }
 	}
+
+	function intDeCasteljau(){
+	  intCurve = []
+	  for (var t = 0; t <= 1; t+=0.001) {
+		var auxPoints = []
+		auxPoints = intPoints
+		while (auxPoints.length>1) {
+		  var tamanho = auxPoints.length
+		  var temp2 = []
+		  for (var i = 0; i < tamanho-1; i++) {
+			var newPoint = interp(auxPoints[i], auxPoints[i+1], t)
+			temp2.push(newPoint)
+		  }
+		  auxPoints = temp2;
+		}
+		intCurve.push(auxPoints[0].x+750)
+		intCurve.push(auxPoints[0].y)
+	  }
+	}
+
 	canvas1.on('click', function(e) {
 			curve = []
         	points.push(new Point(e.x, e.y))
@@ -76,6 +97,52 @@
 			stage.children(stageObjects);
 		}
       	});
+
+	canvas2.on('click', function(evt) {
+		/*var rect = new Rect(760, 10, 40, 40)
+		rect.attr('fillColor', 'white');
+		rect.addTo(stage);*/
+		intPoints.push(new Point(evt.x-750, evt.y))
+		console.log(intPoints[0].x + ',' + intPoints[0].y + " " + points.length)
+		var intCirc = new Circle(evt.x, evt.y, 3).fill('red')
+		intCircles.push(intCirc);
+		intCirc.addTo(stage);
+		for(var i = 0; i < points.length; i++) {
+			intPoints.push(new Point(intPoints[0].x + points[i].x, points[i].y) )
+			var circTemp = new Circle(intPoints[i+1].x+750, intPoints[i+1].y, 3).fill('red');
+			intCircles.push(circTemp);
+			circTemp.addTo(stage);
+			console.log(intPoints[i+1].x+750 + ',' + intPoints[i+1].y)			
+			console.log(intPoints[i+1].x + ',' + intPoints[i+1].y)			
+			console.log(points[i].x + ',' + points[i].y)
+			console.log(intPoints[i].x + ',' + intPoints[i].y)
+			console.log(" ");
+		}
+		var intPaths = []
+		for(var i=0;i<intCircles.length-1;i++){
+			intPaths.push(new Path([
+				['moveTo', intCircles[i].attr('x'), intCircles[i].attr('y')],
+				['lineTo', intCircles[i+1].attr('x'), intCircles[i+1].attr('y')]				
+			]).stroke('red',0.9));			
+		}
+		intPaths.forEach(function (p) {
+			p.addTo(stage);
+		})
+		intDeCasteljau()
+		var tempPath = new Path(intCurve).stroke('white', 0.9) 
+		intPaths.push(tempPath)
+		tempPath.addTo(stage)
+		/*var stageObjects = [];
+		stageObjects.push(canvas1)
+		stageObjects.push(canvas2)
+		intPaths.forEach(function(p){
+			stageObjects.push(p);
+		});
+		intCircles.forEach(function(c) {
+			stageObjects.push(c);
+		});
+		stage.children(stageObjects);*/
+	})
 
 	
 
