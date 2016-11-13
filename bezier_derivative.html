@@ -73,6 +73,9 @@
         	var circ = new Circle(e.x, e.y, 3).fill('navy');
 			circles.push(circ);
         	circ.addTo(stage);
+			intPoints = []
+			intCircles = []
+			intPaths = []
 		if(circles.length > 1){
 			var paths = []
 			for(var i=0;i<circles.length-1;i++){
