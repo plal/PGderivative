@@ -116,24 +116,6 @@ bonsai.run(document.getElementById('movie'), {
 		
     });
 		
-	stage.on('doubleclick', function(e) {
-	  console.log("gritinho")
-	  /*controlLines = []
-		for(var i=0; i<circles.length; i++) {
-		  if(circles[i] == e.target){
-			circles.splice(i, 1);
-			points.splice(i,1)
-			getCurve()
-		  }
-		}
-		if(circles.length > 1){
-		  for(var i=0; i<circles.length-1; i++){
-			controlLines.push(new Path([points[i].x,points[i].y,points[i+1].x,points[i+1].y]).stroke('red', 0.9))
-		  }
-		}
-		renderObjects()*/
-	});
-
 	canvas2.on('click', function(evt) {
 		/*var rect = new Rect(760, 10, 40, 40)
 		rect.attr('fillColor', 'white');
